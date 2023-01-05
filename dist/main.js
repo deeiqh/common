@@ -12,13 +12,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const uri = "mongodb://localhost:27017/";
 const client = new mongodb_1.MongoClient(uri);
+const migrateDocuments = (collection) => __awaiter(void 0, void 0, void 0, function* () {
+    yield collection.updateMany({
+        _id: {
+            $exists: false,
+        },
+    }, {
+        $set: {
+            _id: new mongodb_1.ObjectId(),
+            name: "Lista",
+            emoji: ":p",
+            weight: new mongodb_1.Long("0"),
+        },
+    });
+});
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield client.connect();
             const db = client.db("migrationdb");
-            const pets = db.collection("pets");
-            yield pets.insertOne({ b: "b" });
+            const users = db.collection("users");
+            migrateDocuments(users);
         }
         catch (error) {
             console.log(error);
