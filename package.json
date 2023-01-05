@@ -4,8 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch src -e ts --ignore dist --exec npm run build",
+    "build": "npx tsc && node dist/main.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^4.13.0",
+    "typescript": "^4.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }
