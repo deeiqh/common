@@ -3,17 +3,12 @@ import { faker } from "@faker-js/faker";
 
 const migrateUsersDocuments = async (users: Collection): Promise<Document> => {
   return await users.updateMany(
-    {
-      _id: {
-        $exists: false,
-      },
-    },
+    {},
     {
       $set: {
-        _id: new ObjectId(),
-        name: faker.name.firstName(),
-        emoji: faker.internet.emoji(),
-        weight: new Long(faker.datatype.number({ min: 0, max: 200 })),
+        name: "Default",
+        emoji: "\u{1F60E}",
+        weight: new Long(0),
       },
     }
   );
