@@ -1,8 +1,7 @@
-import { Collection, Long, MongoClient, ObjectId, Document } from "mongodb";
-import { faker } from "@faker-js/faker";
+import { Collection, Long, MongoClient, Document } from "mongodb";
 
-const migrateUsersDocuments = async (users: Collection): Promise<Document> => {
-  return await users.updateMany(
+const migrateUsersDocuments = (users: Collection): Promise<Document> => {
+  return users.updateMany(
     {},
     {
       $set: {
@@ -23,7 +22,7 @@ async function run(): Promise<void> {
     const db = client.db("migration-db");
     const users = db.collection("users");
 
-    migrateUsersDocuments(users);
+    await migrateUsersDocuments(users);
   } catch (error) {
     console.log(error);
   }
