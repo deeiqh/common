@@ -9,7 +9,6 @@ const params = {
 export async function sendSMS(): Promise<void> {
   try {
     const data = await snsClient.send(new PublishCommand(params));
-    console.log("Success.", data);
   } catch (error) {
     console.log(error);
   }
