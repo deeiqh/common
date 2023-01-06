@@ -2,7 +2,7 @@ import { PublishCommand } from "@aws-sdk/client-sns";
 import { snsClient } from "./sns-client";
 
 const params = {
-  Message: "Hello",
+  Message: "Este es tu código de verificación: CODE",
   PhoneNumber: process.env.MY_PHONE_NUMBER,
 };
 
