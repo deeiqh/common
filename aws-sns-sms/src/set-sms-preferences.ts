@@ -7,7 +7,7 @@ const params = {
     DefaultSenderID: "Hapi",
     MonthlySpendLimit: "1",
     DeliveryStatusSuccessSamplingRate: "0",
-    DeliveryStatusIAMRole: process.env.SNS_CLOUDWATCH_ROLE_ARN as string,
+    DeliveryStatusIAMRole: process.env.AWS_ARN_ROLE_SNS_CLOUDWATCH as string,
   },
 };
 
