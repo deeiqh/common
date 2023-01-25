@@ -1,15 +1,12 @@
-import { Controller, Get, Inject, OnModuleInit, Post } from '@nestjs/common';
-import { ClientGrpc, ClientGrpcProxy } from '@nestjs/microservices';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { APP_CLIENT } from './app.module';
 
 @Controller()
-export class AppController implements OnModuleInit {
+export class AppController {
   private appService: any;
 
-  constructor(@Inject('APP_CLIENT') private client: ClientGrpc) {}
-
-  onModuleInit() {
+  constructor(@Inject('APP_CLIENT') private client: ClientGrpc) {
     this.appService = this.client.getService('CarService');
   }
 
