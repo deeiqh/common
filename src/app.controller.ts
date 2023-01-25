@@ -4,12 +4,6 @@ import { kafkaConfig } from './configs/kafka.config';
 
 @Controller()
 export class AppController {
-  // @Query(() => String)
-  // hello(): string {
-  //   return 'hello';
-  // }
-
-  // @Mutation(() => String)
   // @UseGuards(SendOtpGuard)
   @EventPattern('notification-result')
   // @UseGuards(ValidateOtpGuard)
