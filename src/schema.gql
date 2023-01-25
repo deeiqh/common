@@ -1,0 +1,20 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type BaseResponse {
+  message: String!
+  statusCode: String!
+}
+
+input ChangeNameRequest {
+  newName: String!
+}
+
+type Mutation {
+  changeName(input: ChangeNameRequest!): BaseResponse!
+}
+
+type Query {
+  foo: String!
+}

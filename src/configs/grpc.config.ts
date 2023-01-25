@@ -5,7 +5,7 @@ export const grpcConfig: GrpcOptions = {
   transport: Transport.GRPC,
   options: {
     url: 'localhost:3001',
-    package: 'genericVerify',
-    protoPath: join(__dirname, '../protos/generic-verify.proto'),
+    package: 'user',
+    protoPath: join(__dirname, '../protos/user.proto'),
   },
 };
