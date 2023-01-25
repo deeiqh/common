@@ -4,10 +4,10 @@ import { SendOtpGuard } from './guards/send-otp.guard';
 import { ValidateOtpGuard } from './guards/validate-otp.guard';
 
 @Controller()
-export class AppService {
+export class AppController {
   @UseGuards(SendOtpGuard, ValidateOtpGuard)
   @GrpcMethod('CarService', 'LogCar')
-  async logCar(): Promise<{ a: 1 }> {
-    return { a: 1 };
+  async logCar(): Promise<{ a: 3 }> {
+    return { a: 3 };
   }
 }

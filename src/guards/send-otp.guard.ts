@@ -1,12 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { CanActivate, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SendOtpGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    console.log(1);
+  canActivate(): boolean {
     return true;
   }
 }
