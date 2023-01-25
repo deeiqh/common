@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package genericVerify;
+
+service AppService {
+  rpc LogCar(Void) returns (Obj);
+}
+
+message Void {}
+
+message Obj {
+  string a = 1;
+}

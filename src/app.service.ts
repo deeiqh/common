@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { kafkaConfig } from 'src/configs/kafka.config';
 
 @Injectable()
-export class ClientService {
+export class AppService {
   @Client(kafkaConfig)
   client: ClientKafka;
 
