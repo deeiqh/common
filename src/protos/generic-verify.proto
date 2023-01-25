@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package genericVerify;
 
-service AppService {
+service CarService {
   rpc LogCar(Void) returns (Obj);
 }
 

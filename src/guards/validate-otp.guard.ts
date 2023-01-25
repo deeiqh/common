@@ -6,10 +6,10 @@ export class ValidateOtpGuard implements CanActivate {
     const p = new Promise(function (resolve, reject) {
       setTimeout(function () {
         resolve('anything');
-      }, 3000);
+      }, 1000);
     });
     await p;
     console.log(2);
-    return true;
+    return false;
   }
 }

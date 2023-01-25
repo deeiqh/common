@@ -1,17 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { Client, ClientKafka } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
-import { kafkaConfig } from 'src/configs/kafka.config';
+import { Controller, UseGuards } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
+import { SendOtpGuard } from './guards/send-otp.guard';
+import { ValidateOtpGuard } from './guards/validate-otp.guard';
 
-@Injectable()
+@Controller()
 export class AppService {
-  @Client(kafkaConfig)
-  client: ClientKafka;
-
-  async send(
-    category: string,
-    message: Record<string, unknown>,
-  ): Promise<void> {
-    await firstValueFrom(this.client.emit(category, message));
+  @UseGuards(SendOtpGuard, ValidateOtpGuard)
+  @GrpcMethod('CarService', 'LogCar')
+  async logCar(): Promise<{ a: 1 }> {
+    return { a: 1 };
   }
 }
