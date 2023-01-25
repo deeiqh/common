@@ -1,13 +1,13 @@
-import { Controller } from '@nestjs/common';
-import { Client, ClientKafka, EventPattern } from '@nestjs/microservices';
-import { kafkaConfig } from './configs/kafka.config';
+import { Controller, UseGuards } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
+import { SendOtpGuard } from './guards/send-otp.guard';
+import { ValidateOtpGuard } from './guards/validate-otp.guard';
 
 @Controller()
 export class AppController {
-  // @UseGuards(SendOtpGuard)
+  @UseGuards(SendOtpGuard, ValidateOtpGuard)
   @EventPattern('notification-result')
-  // @UseGuards(ValidateOtpGuard)
-  async logCar(): Promise<void> {
-    console.log('aaaaaaaaaaaaaaaaaaaaa car');
+  async logCar(data: Record<string, unknown>): Promise<void> {
+    console.log('data', data);
   }
 }

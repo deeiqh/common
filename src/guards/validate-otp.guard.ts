@@ -1,11 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
 
 @Injectable()
 export class ValidateOtpGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const p = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        resolve('anything');
+      }, 5000);
+    });
+    await p;
+    console.log(2);
     return true;
   }
 }

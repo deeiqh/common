@@ -12,6 +12,6 @@ export class ClientService {
     category: string,
     message: Record<string, unknown>,
   ): Promise<void> {
-    console.log(await firstValueFrom(this.client.emit(category, message)));
+    await firstValueFrom(this.client.emit(category, message));
   }
 }

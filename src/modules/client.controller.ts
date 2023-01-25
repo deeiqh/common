@@ -7,6 +7,6 @@ export class ClientController {
 
   @Post()
   async makeCar(): Promise<void> {
-    this.clientService.send('notification-result', { payload: true });
+    this.clientService.send('notification-result', { a: 1 });
   }
 }
