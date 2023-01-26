@@ -10,12 +10,12 @@ export class AppService {
 
   async sendOtp(input: { targetType: string; target: string }): Promise<void> {
     console.log('sendOtp input: ', input);
-    this.client.emit('otp-validated', { z: 1 });
+    this.client.emit('otp-validated', input.target);
     console.log('otp-validated event emitted. Shoud be by other service');
     return;
   }
 
-  async otpValidated(): Promise<boolean> {
+  async otpValidated(target: string): Promise<boolean> {
     let validated = false;
 
     await this.kafkaConsumer.stop();
@@ -24,8 +24,10 @@ export class AppService {
       fromBeginning: true,
     });
     await this.kafkaConsumer.run({
-      eachMessage: async () => {
-        validated = true;
+      eachMessage: async ({ message }) => {
+        if (target === message.value?.toString()) {
+          validated = true;
+        }
       },
     });
 
