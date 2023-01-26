@@ -1,4 +1,4 @@
-import { CanActivate, Inject, Injectable } from '@nestjs/common';
+import { CanActivate, Injectable } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 
 @Injectable()

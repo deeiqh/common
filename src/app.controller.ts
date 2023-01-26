@@ -3,7 +3,11 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { SendOtpGuard } from './guards/send-otp.guard';
 import { ValidateOtpGuard } from './guards/validate-otp.guard';
 
-type ChangeNameRequest = { newName: string };
+type ChangeNameRequest = {
+  targetType: string;
+  target: string;
+  newName: string;
+};
 type BaseResponse = { message: string; statusCode: string };
 @Controller()
 export class AppController {

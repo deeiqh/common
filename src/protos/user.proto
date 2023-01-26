@@ -7,8 +7,9 @@ service UserService {
 }
 
 message ChangeNameRequest {
-  string email = 1;
-  string newName = 2;
+  string targetType = 1;
+  string target = 2;
+  string newName = 3;
 }
 
 message BaseResponse {
