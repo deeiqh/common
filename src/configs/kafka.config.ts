@@ -8,7 +8,7 @@ export const kafkaConfig: KafkaOptions = {
       brokers: ['inspiron:9092'],
     },
     consumer: {
-      groupId: 'generic-verify-consumer-group',
+      groupId: 'user-consumer-group',
       retry: {
         retries: 2,
         initialRetryTime: 30,
