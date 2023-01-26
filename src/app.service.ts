@@ -23,12 +23,7 @@ export class AppService {
 
   async otpValidated(target: string): Promise<boolean> {
     let canceled = '';
-
     await this.kafkaConsumer.stop();
-    await this.kafkaConsumer.subscribe({
-      topic: 'otp-validated',
-      fromBeginning: true,
-    });
     await this.kafkaConsumer.run({
       eachMessage: async ({ message }) => {
         const messageJson: { target: string; canceled: boolean } = JSON.parse(

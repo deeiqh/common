@@ -19,6 +19,10 @@ import { kafkaConfig } from './configs/kafka.config';
         });
         const consumer = kafka.consumer({ groupId: 'user-consumer-group' });
         await consumer.connect();
+        await consumer.subscribe({
+          topic: 'otp-validated',
+          fromBeginning: true,
+        });
         return consumer;
       },
     },
