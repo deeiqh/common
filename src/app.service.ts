@@ -10,7 +10,7 @@ export class AppService {
 
   async sendOtp(input: { targetType: string; target: string }): Promise<void> {
     console.log('sendOtp input: ', input);
-    this.client.emit('otp-validated', { z: 1 });
+    this.client.emit('otp-validatedw', { z: 1 });
     console.log('otp-validated event emitted. Shoud be by other service');
     return;
   }
@@ -18,30 +18,22 @@ export class AppService {
   async otpValidated(): Promise<boolean> {
     let validated = false;
 
-    console.log('otpValidated service start');
-    await this.kafkaConsumer.connect();
     await this.kafkaConsumer.stop();
     await this.kafkaConsumer.subscribe({
       topic: 'otp-validated',
       fromBeginning: true,
     });
     await this.kafkaConsumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        console.log({
-          topic,
-          partition,
-          offset: message.offset,
-          value: message.value?.toString(),
-        });
-        console.log('RRRRRRRRRRRRRRRRRRRRRRreceived event');
+      eachMessage: async () => {
         validated = true;
       },
     });
+
     const maxMinutes = 5 / 60;
     const intervalTime = 100;
     const maxIterations = (maxMinutes * 60 * 1000) / intervalTime;
     let iteration = 0;
-    const wait = new Promise<boolean>((resolve) => {
+    const isOtpValidated = new Promise<boolean>((resolve) => {
       setInterval(() => {
         if (validated) {
           resolve(true);
@@ -52,10 +44,7 @@ export class AppService {
         iteration++;
       }, intervalTime);
     });
-    const result = await wait;
-    if (!result) {
-      console.log('NNNNNNNNNNNNNNNnot received event');
-    }
-    return result;
+
+    return await isOtpValidated;
   }
 }

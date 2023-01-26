@@ -12,12 +12,14 @@ import { kafkaConfig } from './configs/kafka.config';
     AppService,
     {
       provide: 'kafkaConsumer',
-      useFactory: () => {
+      useFactory: async () => {
         const kafka = new Kafka({
           clientId: 'client',
           brokers: ['inspiron:9092'],
         });
-        return kafka.consumer({ groupId: 'user-consumer-group' });
+        const consumer = kafka.consumer({ groupId: 'user-consumer-group' });
+        await consumer.connect();
+        return consumer;
       },
     },
   ],
