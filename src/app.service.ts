@@ -10,7 +10,7 @@ export class AppService {
 
   async sendOtp(input: { targetType: string; target: string }): Promise<void> {
     console.log('sendOtp input: ', input);
-    this.client.emit('otp-validatedw', { z: 1 });
+    this.client.emit('otp-validated', { z: 1 });
     console.log('otp-validated event emitted. Shoud be by other service');
     return;
   }
@@ -33,18 +33,21 @@ export class AppService {
     const intervalTime = 100;
     const maxIterations = (maxMinutes * 60 * 1000) / intervalTime;
     let iteration = 0;
-    const isOtpValidated = new Promise<boolean>((resolve) => {
-      setInterval(() => {
+    let intervalId: NodeJS.Timer;
+    const isOtpValidated = await new Promise<boolean>((resolve) => {
+      intervalId = setInterval(() => {
         if (validated) {
+          clearInterval(intervalId);
           resolve(true);
         }
         if (iteration > maxIterations) {
+          clearInterval(intervalId);
           resolve(false);
         }
         iteration++;
       }, intervalTime);
     });
 
-    return await isOtpValidated;
+    return isOtpValidated;
   }
 }
