@@ -10,13 +10,19 @@ export class AppService {
 
   async sendOtp(input: { targetType: string; target: string }): Promise<void> {
     console.log('sendOtp input: ', input);
-    this.client.emit('otp-validated', input.target);
+
+    this.client.emit('otp-validated', {
+      target: input.target,
+      canceled: false,
+    });
+
     console.log('otp-validated event emitted. Shoud be by other service');
+
     return;
   }
 
   async otpValidated(target: string): Promise<boolean> {
-    let validated = false;
+    let canceled = '';
 
     await this.kafkaConsumer.stop();
     await this.kafkaConsumer.subscribe({
@@ -25,8 +31,11 @@ export class AppService {
     });
     await this.kafkaConsumer.run({
       eachMessage: async ({ message }) => {
-        if (target === message.value?.toString()) {
-          validated = true;
+        const messageJson: { target: string; canceled: boolean } = JSON.parse(
+          message.value?.toString() as string,
+        );
+        if (messageJson.target === target) {
+          canceled = messageJson.canceled ? 'true' : 'false';
         }
       },
     });
@@ -38,11 +47,11 @@ export class AppService {
     let intervalId: NodeJS.Timer;
     const isOtpValidated = await new Promise<boolean>((resolve) => {
       intervalId = setInterval(() => {
-        if (validated) {
+        if (canceled === 'false') {
           clearInterval(intervalId);
           resolve(true);
         }
-        if (iteration > maxIterations) {
+        if (canceled === 'true' || iteration > maxIterations) {
           clearInterval(intervalId);
           resolve(false);
         }
