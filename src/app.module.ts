@@ -6,8 +6,6 @@ import { join } from 'path';
 import { AppResolver } from './app.resolver';
 import { grpcConfig } from './configs/grpc.config';
 
-export const APP_CLIENT = 'APP_CLIENT';
-
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({

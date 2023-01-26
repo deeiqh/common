@@ -8,8 +8,9 @@ type BaseResponse {
 }
 
 input ChangeNameRequest {
-  email: String!
   newName: String!
+  target: String!
+  targetType: String!
 }
 
 type Mutation {
