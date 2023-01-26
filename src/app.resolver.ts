@@ -14,6 +14,8 @@ import { firstValueFrom } from 'rxjs';
 @InputType()
 class ChangeNameRequest {
   @Field()
+  email: string;
+  @Field()
   newName: string;
 }
 
