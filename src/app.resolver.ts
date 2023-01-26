@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
   Args,
   Field,
@@ -8,8 +8,9 @@ import {
   Query,
   Resolver,
 } from '@nestjs/graphql';
-import { ClientGrpc } from '@nestjs/microservices';
+import { Client, ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { grpcConfig } from './configs/grpc.config';
 
 @InputType()
 class ChangeNameRequest {
@@ -30,10 +31,13 @@ class BaseResponse {
 }
 
 @Resolver()
-export class AppResolver {
-  private appService: any;
+export class AppResolver implements OnModuleInit {
+  @Client(grpcConfig)
+  readonly client: ClientGrpc;
 
-  constructor(@Inject('USER_SERVICE') private client: ClientGrpc) {
+  appService: any;
+
+  onModuleInit() {
     this.appService = this.client.getService('UserService');
   }
 
