@@ -22,6 +22,8 @@ class ChangeNameRequest {
 @InputType()
 class ValidateOperationOtpRequest {
   @Field()
+  operationUUID: string;
+  @Field()
   code: string;
 }
 
@@ -56,16 +58,12 @@ export class AppResolver implements OnModuleInit {
   ): Promise<BaseResponse> {
     try {
       const headers = context.req.headers;
-      const otpTargetType = headers['otp-target-type'];
-      const otpTarget = headers['otp-target'];
-      const otpRandomUuidForOperations =
-        headers['otp-random-uuid-for-operations'];
 
       return await firstValueFrom(
         this.appService.changeName({
-          otpTargetType,
-          otpTarget,
-          otpRandomUuidForOperations,
+          targetType: headers['otp-target-type'],
+          target: headers['otp-target'],
+          operationUUID: headers['otp-new-uuid-for-this-operation'],
           ...input,
         }),
       );
@@ -79,15 +77,11 @@ export class AppResolver implements OnModuleInit {
 
   @Mutation(() => BaseResponse)
   async validateOperationOtp(
-    @Context() context: any,
     @Args('input') input: ValidateOperationOtpRequest,
   ): Promise<BaseResponse> {
     try {
-      const otpRandomUuidForOperations =
-        context.req.headers['otp-random-uuid-for-operations'];
       return await firstValueFrom(
         this.appService.validateOperationOtp({
-          uuid: otpRandomUuidForOperations,
           ...input,
         }),
       );

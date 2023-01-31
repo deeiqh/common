@@ -22,4 +22,5 @@ type Query {
 
 input ValidateOperationOtpRequest {
   code: String!
+  operationUUID: String!
 }
