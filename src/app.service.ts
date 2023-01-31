@@ -1,52 +1,70 @@
-import { Inject } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
-import { Consumer } from 'kafkajs';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { EventEmitter } from 'events';
 
+@Injectable()
 export class AppService {
-  constructor(
-    @Inject('USER_SERVICE') private client: ClientKafka,
-    @Inject('kafkaConsumer') private kafkaConsumer: Consumer,
-  ) {}
+  constructor(private eventEmitter: EventEmitter) {}
 
-  async sendOtp(input: { targetType: string; target: string }): Promise<void> {
-    console.log('sendOtp input: ', input);
+  async sendOperationOtp(input: {
+    targetType: string;
+    target: string;
+  }): Promise<{ uuid: string }> {
+    const uuid = randomUUID();
 
-    this.client.emit('otp-validated', {
-      target: input.target,
-      canceled: false,
-    });
+    // Emit 'sendOperationOtp' event to notification service.
+    // Event payload: uuid, targetType, target.
+    // Notification service write to one_time_password table.
 
-    console.log('otp-validated event emitted. Shoud be by other service');
-
-    return;
+    return { uuid };
   }
 
-  async otpValidated(target: string): Promise<boolean> {
-    let canceled = '';
-    await this.kafkaConsumer.stop();
-    await this.kafkaConsumer.run({
-      eachMessage: async ({ message }) => {
-        const messageJson: { target: string; canceled: boolean } = JSON.parse(
-          message.value?.toString() as string,
-        );
-        if (messageJson.target === target) {
-          canceled = messageJson.canceled ? 'true' : 'false';
-        }
-      },
+  async validateOperationOtp(input: {
+    uuid: string;
+    code: string;
+  }): Promise<void> {
+    // Read uuid register from one_time_password table
+    // Compare code and check expiration date
+    // Emit 'otp-validated' event to otpValidatedGuard
+
+    const T = this.eventEmitter.emit('otp-validated', {
+      uuid: input.uuid,
+      isValid: true,
+    });
+    console.log('T: ', T);
+  }
+
+  //called inside the validateOtpGuard
+  async otpValidated(input: { uuid: string }): Promise<boolean> {
+    let wasProcessed = false;
+    let isValid = false;
+    this.eventEmitter.on('otp-validated', (payload) => {
+      console.log('ON event');
+      console.log(input.uuid, payload.uuid);
+      if (input.uuid === payload.uuid) {
+        wasProcessed = true;
+        isValid = payload.isValid;
+        console.log('ALL OK');
+      }
     });
 
-    const maxMinutes = 5 / 60;
+    const maxMinutes = 30 / 60;
     const intervalTime = 100;
     const maxIterations = (maxMinutes * 60 * 1000) / intervalTime;
     let iteration = 0;
     let intervalId: NodeJS.Timer;
     const isOtpValidated = await new Promise<boolean>((resolve) => {
       intervalId = setInterval(() => {
-        if (canceled === 'false') {
+        if (wasProcessed) {
+          if (isValid) {
+            clearInterval(intervalId);
+            resolve(true);
+          }
           clearInterval(intervalId);
-          resolve(true);
+          resolve(false);
         }
-        if (canceled === 'true' || iteration > maxIterations) {
+        if (iteration > maxIterations) {
           clearInterval(intervalId);
           resolve(false);
         }

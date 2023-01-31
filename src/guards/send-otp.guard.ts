@@ -7,7 +7,10 @@ export class SendOtpGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const data = context.switchToRpc().getData();
-    await this.appService.sendOtp({ ...data });
+    const { uuid } = await this.appService.sendOperationOtp({ ...data });
+
+    data.otp = { uuid };
+    console.log('sendOtpGuard data: ', data);
     return true;
   }
 }

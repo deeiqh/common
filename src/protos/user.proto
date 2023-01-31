@@ -4,6 +4,7 @@ package user;
 
 service UserService {
   rpc ChangeName(ChangeNameRequest) returns (BaseResponse);
+  rpc ValidateOperationOtp(ValidateOperationOtpRequest) returns (BaseResponse);
 }
 
 message ChangeNameRequest {
@@ -15,4 +16,9 @@ message ChangeNameRequest {
 message BaseResponse {
   string message = 1;
   string statusCode = 2;
+}
+
+message ValidateOperationOtpRequest {
+  string uuid = 1;
+  string code = 2;
 }
