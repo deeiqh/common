@@ -8,9 +8,10 @@ service UserService {
 }
 
 message ChangeNameRequest {
-  string targetType = 1;
-  string target = 2;
-  string newName = 3;
+  string otpTargetType = 1;
+  string otpTarget = 2;
+  string otpRandomUuidForOperations = 3;  
+  string newName = 4;
 }
 
 message BaseResponse {

@@ -5,8 +5,9 @@ import { OtpValidatedGuard } from './guards/otp-validated.guard';
 import { SendOtpGuard } from './guards/send-otp.guard';
 
 type ChangeNameRequest = {
-  targetType: string;
-  target: string;
+  otpTargetType: string;
+  otpTarget: string;
+  otpRandomUuidForOperations: string;
   newName: string;
 };
 type BaseResponse = { message: string; statusCode: string };
@@ -14,8 +15,8 @@ type BaseResponse = { message: string; statusCode: string };
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @UseGuards(SendOtpGuard, OtpValidatedGuard)
   @GrpcMethod('UserService', 'ChangeName')
+  @UseGuards(SendOtpGuard, OtpValidatedGuard)
   async changeName(input: ChangeNameRequest): Promise<BaseResponse> {
     return { message: input.newName, statusCode: '200' };
   }
@@ -26,7 +27,9 @@ export class AppController {
     code: string;
   }): Promise<BaseResponse> {
     const { uuid, code } = input;
+
     await this.appService.validateOperationOtp({ uuid, code });
-    return { message: input.uuid, statusCode: '200' };
+
+    return { message: uuid, statusCode: '200' };
   }
 }
