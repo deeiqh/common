@@ -10,6 +10,7 @@ export class AppService {
   async sendOperationOtp(input: {
     targetType: string;
     target: string;
+    operationUUID: string;
   }): Promise<boolean> {
     // Emit 'sendOperationOtp' event to notification service.
     // Event payload: uuid, targetType, target.
@@ -19,26 +20,28 @@ export class AppService {
   }
 
   async validateOperationOtp(input: {
-    uuid: string;
+    operationUUID: string;
     code: string;
   }): Promise<void> {
     // Read uuid register from one_time_password table
     // Compare code and check expiration date
     // Emit 'otp-validated' event to otpValidatedGuard
 
+    const { operationUUID } = input;
+
     this.eventEmitter.emit('otp-validated', {
-      uuid: input.uuid,
+      operationUUID,
       isValid: true,
     });
   }
 
   //called inside the validateOtpGuard
-  async otpValidated(input: { uuid: string }): Promise<boolean> {
+  async otpValidated(input: { operationUUID: string }): Promise<boolean> {
     let wasProcessed = false;
     let isValid = false;
 
     this.eventEmitter.on('otp-validated', (payload) => {
-      if (input.uuid === payload.uuid) {
+      if (input.operationUUID === payload.operationUUID) {
         wasProcessed = true;
         isValid = payload.isValid;
       }

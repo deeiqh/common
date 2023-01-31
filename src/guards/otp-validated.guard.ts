@@ -7,9 +7,10 @@ export class OtpValidatedGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const data = context.switchToRpc().getData();
+    const { operationUUID } = data;
 
     return await this.appService.otpValidated({
-      uuid: data.otpRandomUuidForOperations,
+      operationUUID,
     });
   }
 }
