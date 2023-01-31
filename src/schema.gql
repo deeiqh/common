@@ -15,8 +15,14 @@ input ChangeNameRequest {
 
 type Mutation {
   changeName(input: ChangeNameRequest!): BaseResponse!
+  validateOperationOtp(input: ValidateOperationOtpRequest!): BaseResponse!
 }
 
 type Query {
   foo: String!
+}
+
+input ValidateOperationOtpRequest {
+  code: String!
+  uuid: String!
 }

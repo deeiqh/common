@@ -22,6 +22,14 @@ class ChangeNameRequest {
   newName: string;
 }
 
+@InputType()
+class ValidateOperationOtpRequest {
+  @Field()
+  uuid: string;
+  @Field()
+  code: string;
+}
+
 @ObjectType()
 class BaseResponse {
   @Field()
@@ -52,6 +60,20 @@ export class AppResolver implements OnModuleInit {
   ): Promise<BaseResponse> {
     try {
       return await firstValueFrom(this.appService.changeName(input));
+    } catch (e) {
+      return {
+        message: `Error: ${e.details}`,
+        statusCode: '403',
+      };
+    }
+  }
+
+  @Mutation(() => BaseResponse)
+  async validateOperationOtp(
+    @Args('input') input: ValidateOperationOtpRequest,
+  ): Promise<BaseResponse> {
+    try {
+      return await firstValueFrom(this.appService.validateOperationOtp(input));
     } catch (e) {
       return {
         message: `Error: ${e.details}`,
