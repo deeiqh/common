@@ -1,4 +1,4 @@
-import { Headers, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import {
   Args,
   Context,
