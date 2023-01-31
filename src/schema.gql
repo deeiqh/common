@@ -9,8 +9,6 @@ type BaseResponse {
 
 input ChangeNameRequest {
   newName: String!
-  target: String!
-  targetType: String!
 }
 
 type Mutation {
@@ -24,5 +22,4 @@ type Query {
 
 input ValidateOperationOtpRequest {
   code: String!
-  uuid: String!
 }

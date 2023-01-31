@@ -1,6 +1,7 @@
-import { OnModuleInit } from '@nestjs/common';
+import { Headers, OnModuleInit } from '@nestjs/common';
 import {
   Args,
+  Context,
   Field,
   InputType,
   Mutation,
@@ -15,17 +16,11 @@ import { grpcConfig } from './configs/grpc.config';
 @InputType()
 class ChangeNameRequest {
   @Field()
-  targetType: string;
-  @Field()
-  target: string;
-  @Field()
   newName: string;
 }
 
 @InputType()
 class ValidateOperationOtpRequest {
-  @Field()
-  uuid: string;
   @Field()
   code: string;
 }
@@ -56,10 +51,24 @@ export class AppResolver implements OnModuleInit {
 
   @Mutation(() => BaseResponse)
   async changeName(
+    @Context() context: any,
     @Args('input') input: ChangeNameRequest,
   ): Promise<BaseResponse> {
     try {
-      return await firstValueFrom(this.appService.changeName(input));
+      const headers = context.req.headers;
+      const otpTargetType = headers['otp-target-type'];
+      const otpTarget = headers['otp-target'];
+      const otpRandomUuidForOperations =
+        headers['otp-random-uuid-for-operations'];
+
+      return await firstValueFrom(
+        this.appService.changeName({
+          otpTargetType,
+          otpTarget,
+          otpRandomUuidForOperations,
+          ...input,
+        }),
+      );
     } catch (e) {
       return {
         message: `Error: ${e.details}`,
@@ -70,10 +79,18 @@ export class AppResolver implements OnModuleInit {
 
   @Mutation(() => BaseResponse)
   async validateOperationOtp(
+    @Context() context: any,
     @Args('input') input: ValidateOperationOtpRequest,
   ): Promise<BaseResponse> {
     try {
-      return await firstValueFrom(this.appService.validateOperationOtp(input));
+      const otpRandomUuidForOperations =
+        context.req.headers['otp-random-uuid-for-operations'];
+      return await firstValueFrom(
+        this.appService.validateOperationOtp({
+          uuid: otpRandomUuidForOperations,
+          ...input,
+        }),
+      );
     } catch (e) {
       return {
         message: `Error: ${e.details}`,
