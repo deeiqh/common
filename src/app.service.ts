@@ -19,7 +19,7 @@ export class AppService {
     const code = 'ABC';
 
     // Emit 'sendOperationOtp' event to notification service.
-    // Event payload: code, targetType, target.
+    // Event payload: code, targetType, target, operationUUID.
 
     const { operationUUID } = input;
     await this.cacheManager.set(operationUUID, {
