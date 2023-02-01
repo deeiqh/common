@@ -1,20 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { EventEmitter } from 'events';
+
+export const OTP_OPERATION_MAX_MINUTES = 1;
 
 @Injectable()
 export class AppService {
-  constructor(private eventEmitter: EventEmitter) {}
+  constructor(
+    private readonly eventEmitter: EventEmitter,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   async sendOperationOtp(input: {
     targetType: string;
     target: string;
     operationUUID: string;
   }): Promise<boolean> {
+    const code = 'ABC';
+
     // Emit 'sendOperationOtp' event to notification service.
-    // Event payload: uuid, targetType, target.
-    // Notification service write to one_time_password table.
+    // Event payload: code, targetType, target.
+
+    const { operationUUID } = input;
+    await this.cacheManager.set(operationUUID, {
+      code,
+    });
 
     return true;
   }
@@ -22,20 +32,31 @@ export class AppService {
   async validateOperationOtp(input: {
     operationUUID: string;
     code: string;
-  }): Promise<void> {
-    // Read uuid register from one_time_password table
-    // Compare code and check expiration date
-    // Emit 'otp-validated' event to otpValidatedGuard
-
+  }): Promise<string> {
     const { operationUUID } = input;
+    const { code } =
+      ((await this.cacheManager.get(operationUUID)) as any) || {};
 
-    this.eventEmitter.emit('otp-validated', {
-      operationUUID,
-      isValid: true,
-    });
+    const isValid = code === input.code;
+
+    if (!code || isValid) {
+      this.eventEmitter.emit('otp-validated', {
+        operationUUID,
+        isValid,
+      });
+
+      if (!code) {
+        return 'Expired code';
+      }
+
+      await this.cacheManager.del(operationUUID);
+
+      return 'Validated code';
+    }
+
+    return 'Invalid code. Try again.';
   }
 
-  //called inside the validateOtpGuard
   async otpValidated(input: { operationUUID: string }): Promise<boolean> {
     let wasProcessed = false;
     let isValid = false;
@@ -47,7 +68,7 @@ export class AppService {
       }
     });
 
-    const maxMinutes = 30 / 60;
+    const maxMinutes = OTP_OPERATION_MAX_MINUTES;
     const intervalTime = 100;
     const maxIterations = (maxMinutes * 60 * 1000) / intervalTime;
     let iteration = 0;

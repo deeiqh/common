@@ -28,8 +28,11 @@ export class AppController {
   }): Promise<BaseResponse> {
     const { operationUUID, code } = input;
 
-    await this.appService.validateOperationOtp({ operationUUID, code });
+    const message = await this.appService.validateOperationOtp({
+      operationUUID,
+      code,
+    });
 
-    return { message: operationUUID, statusCode: '200' };
+    return { message, statusCode: '200' };
   }
 }
