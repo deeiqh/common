@@ -1,4 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
 import { Cache } from 'cache-manager';
 import { EventEmitter } from 'events';
 
@@ -9,6 +10,7 @@ export class AppService {
   constructor(
     private readonly eventEmitter: EventEmitter,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject('KAFKA_CLIENT') private readonly clientKafka: ClientKafka,
   ) {}
 
   async sendOperationOtp(input: {
@@ -29,39 +31,11 @@ export class AppService {
     return true;
   }
 
-  async validateOperationOtp(input: {
-    operationUUID: string;
-    code: string;
-  }): Promise<string> {
-    const { operationUUID } = input;
-    const { code } =
-      ((await this.cacheManager.get(operationUUID)) as any) || {};
-
-    const isValid = code === input.code;
-
-    if (!code || isValid) {
-      this.eventEmitter.emit('otp-validated', {
-        operationUUID,
-        isValid,
-      });
-
-      if (!code) {
-        return 'Expired code';
-      }
-
-      await this.cacheManager.del(operationUUID);
-
-      return 'Validated code';
-    }
-
-    return 'Invalid code. Try again.';
-  }
-
   async otpValidated(input: { operationUUID: string }): Promise<boolean> {
     let wasProcessed = false;
     let isValid = false;
 
-    this.eventEmitter.on('otp-validated', (payload) => {
+    this.eventEmitter.on('otp-validated-result', (payload) => {
       if (input.operationUUID === payload.operationUUID) {
         wasProcessed = true;
         isValid = payload.isValid;
@@ -93,5 +67,33 @@ export class AppService {
     });
 
     return isOtpValidated;
+  }
+
+  async validateOperationOtp(input: {
+    operationUUID: string;
+    code: string;
+  }): Promise<string> {
+    const { operationUUID } = input;
+    const { code } =
+      ((await this.cacheManager.get(operationUUID)) as any) || {};
+
+    const isValid = code === input.code;
+
+    if (!code || isValid) {
+      this.clientKafka.emit('otp-validated', {
+        operationUUID,
+        isValid,
+      });
+
+      if (!code) {
+        return 'Expired code';
+      }
+
+      await this.cacheManager.del(operationUUID);
+
+      return 'Validated code';
+    }
+
+    return 'Invalid code. Try again.';
   }
 }
